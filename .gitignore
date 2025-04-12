@@ -7,7 +7,8 @@
 /*.so
 /*.exe
 /*.out
-
+/cmake-build-debug/
+/Chess/cmake-build-debug/
 # Ignore IDE and editor configuration files
 .vscode/
 .idea/

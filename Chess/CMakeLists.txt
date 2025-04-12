@@ -17,7 +17,24 @@ if (MSVC)
     add_compile_options (/W4 /permissive- /Zc:externConstexpr /Zc:inline)
 endif ()
 
-add_executable (Chess "")
+add_executable (Chess ""
+        include/Piece.h
+        include/Board.h
+        include/Rook.h
+        include/King.h
+        src/Board.cpp
+        src/Rook.cpp
+        src/King.cpp
+        include/Queen.h
+        src/Queen.cpp
+        include/Bishop.h
+        src/Bishop.cpp
+        include/GameValidator.h
+        src/GameValidator.cpp
+        include/Knight.h
+        src/Knight.cpp
+        include/Pawn.h
+        src/Pawn.cpp)
 
 
 add_subdirectory (include)
