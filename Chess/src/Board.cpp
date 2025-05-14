@@ -55,11 +55,6 @@ void Board::loadFromString(const std::string& boardString) {
         }
 }
 
-bool Board::canMove(char color) {
-    // Stubbed — logic depends on your piece movement & check detection
-    return true;
-}
-
 std::string Board::getBoardString() const {
     std::string result;
     for (int i = 0; i < 8; ++i)
