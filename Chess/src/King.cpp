@@ -1,8 +1,23 @@
 #include "King.h"
+#include <cmath>
 
+bool King::isLegalMove(int srcRow, int srcCol, int destRow, int destCol, Piece* board[8][8]) {
+    int rowDiff = std::abs(destRow - srcRow);
+    int colDiff = std::abs(destCol - srcCol);
 
-bool King::areSquaresLegal(int srcRow, int srcCol, int destRow, int destCol, Piece* boardMove[8][8]) {
-    int rowDiff = abs(destRow - srcRow);
-    int colDiff = abs(destCol - srcCol);
-    return (rowDiff <= 1 && colDiff <= 1);
+    if (rowDiff > 1 || colDiff > 1)
+        return false;
+
+    for (int r = 0; r < 8; ++r) {
+        for (int c = 0; c < 8; ++c) {
+            Piece* p = board[r][c];
+            if (p && p->getColor() != isWhite) {
+                if (p->isLegalMove(r, c, destRow, destCol, board)) {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
 }

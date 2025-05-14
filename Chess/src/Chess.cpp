@@ -279,7 +279,11 @@ Chess::Chess(const string& start)
 	setFrames();
 	setPieces();
 }
-
+void Chess::setBoard(const std::string &newBoard) {
+	m_boardString = newBoard;  // update the string-of-64
+	setPieces();               // rebuild the ASCII art grid (m_board)
+	m_codeResponse = -1;       // clear any pending replay so doTurn() won't fire again
+}
 // get the source and destination 
 string Chess::getInput()
 {
