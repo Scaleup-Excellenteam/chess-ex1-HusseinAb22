@@ -9,7 +9,7 @@
 using namespace std;
 
 // Forward declaration
-void run(string& board, bool& isWhite, int depth, int numThreads);
+void run(string& board, bool isWhite, int depth, int numThreads);
 
 void runAutomaticGame(int depth, int numThreads) {
     cout << "\n--- Running Automatic Game ---" << endl;
@@ -51,19 +51,22 @@ void runManualGame(int depth, int numThreads) {
     string res;
     bool isWhite = true;
 
-    while (res != "exit") {
-        run(board, isWhite, depth, numThreads); // Show suggestions
+    while (true) {
+
+        run(board, isWhite, depth, numThreads);
+
         res = a.getInput();
         if (res == "exit") break;
 
         try {
             codeResponse = validateMove(res, board, isWhite, false);
+
             if (codeResponse >= 41) {
                 isWhite = !isWhite;
             }
+
             a.setCodeResponse(codeResponse);
-            a.setBoard(board);
-        } catch (const exception& e) {
+        } catch (const std::exception& e) {
             cout << "An error occurred: " << e.what() << endl;
         }
     }
@@ -80,12 +83,12 @@ int main() {
     cin >> mode;
 
     if (mode == "auto") {
-        runAutomaticGame(depth, 1); // No threads
+        runAutomaticGame(depth, 1);
         runAutomaticGame(depth, 2);
         runAutomaticGame(depth, 4);
         runAutomaticGame(depth, 8);
     } else {
-        int numThreads = 4; // Default threads for manual play
+        int numThreads = 4;
         cout << "Enter number of threads for suggestions (e.g., 4): ";
         cin >> numThreads;
         runManualGame(depth, numThreads);
