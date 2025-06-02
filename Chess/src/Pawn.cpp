@@ -1,38 +1,46 @@
+// In Pawn.cpp
 #include "Pawn.h"
 #include <cmath>
 #include <iostream>
-#include <ostream>
-
-#include "Bishop.h"
-#include "Exceptions.h"
-#include "Knight.h"
 #include "Queen.h"
 #include "Rook.h"
+#include "Bishop.h"
+#include "Knight.h"
+#include "Exceptions.h"
 
 bool Pawn::isLegalMove(int srcRow, int srcCol, int destRow, int destCol, Piece* boardMove[8][8]) {
-    int direction = isWhite ? 1 : -1;
-    int startRow = isWhite ? 1 : 6;
+    int direction;
+    int startRow;
 
-
-    if (srcCol == destCol) {
-        if (destRow == srcRow + direction && boardMove[destRow][destCol] == nullptr)
-            return true;
-
-        // First move - 2 steps forward
-        if (srcRow == startRow && destRow == srcRow + 2 * direction &&
-            boardMove[srcRow + direction][srcCol] == nullptr &&
-            boardMove[destRow][destCol] == nullptr)
-            return true;
+    if (isWhite) { // White pawns
+        direction = -1;
+        startRow = 6;
+    } else { // Black pawns
+        direction = 1;
+        startRow = 1;
     }
 
-    // Capture diagonally
-    if (std::abs(destCol - srcCol) == 1 && destRow == srcRow + direction &&
-        boardMove[destRow][destCol] != nullptr &&
-        boardMove[destRow][destCol]->getColor() != isWhite)
-        return true;
+    if (srcCol == destCol) {
+        if (destRow == srcRow + direction && boardMove[destRow][destCol] == nullptr) {
+            return true;
+        }
+        if (srcRow == startRow && destRow == srcRow + 2 * direction &&
+            boardMove[srcRow + direction][destCol] == nullptr &&
+            boardMove[destRow][destCol] == nullptr) {
+            return true;
+        }
+    }
+
+    if (std::abs(destCol - srcCol) == 1 && destRow == srcRow + direction) {
+        if (boardMove[destRow][destCol] != nullptr &&
+            boardMove[destRow][destCol]->getColor() != this->isWhite) {
+            return true;
+        }
+    }
 
     return false;
 }
+
 Piece* Pawn::promote(char promoteTo, bool color) {
     switch (promoteTo) {
         case 'Q': case 'q': return new Queen(color);

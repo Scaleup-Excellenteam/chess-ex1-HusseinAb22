@@ -9,6 +9,4 @@ public:
     bool isLegalMove(int, int, int, int, Piece *boardMove[8][8]) override;
     char getPiece() const override { return isWhite ? 'N' : 'n'; }
 
-
 };
-
