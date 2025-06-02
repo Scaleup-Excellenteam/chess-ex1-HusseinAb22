@@ -42,7 +42,10 @@ add_executable (Chess ""
         include/MoveValidator.h
         src/MoveValidator.cpp
         src/minimax.cpp
-        include/minimax.h)
+        include/minimax.h
+        include/ThreadPool.h
+        src/Threadpool.cpp
+        src/Threadpool.cpp)
 
 
 add_subdirectory (include)

@@ -1,20 +1,20 @@
-#include "Board.h"
 #include "minimax.h"
+#include "Board.h"
 #include "PriorityQueue.h"
 #include "GameValidator.h"
+#include "ThreadPool.h"
 #include <vector>
 #include <map>
 #include <string>
 #include <iostream>
 #include <limits>
+#include <future>
 
-using namespace std;
-
+// ... (evaluateBoard and generateLegalMoves remain the same) ...
 static map<char, int> pieceValue = {
     {'p', 1}, {'n', 3}, {'b', 3}, {'r', 5}, {'q', 9}, {'k', 1000},
     {'P', 1}, {'N', 3}, {'B', 3}, {'R', 5}, {'Q', 9}, {'K', 1000}
 };
-
 int evaluateBoard(Board& board, bool isWhite) {
     int score = 0;
 
@@ -146,35 +146,48 @@ int minimax(Board& board, int depth, bool maximizing, bool isWhite) {
     return bestScore;
 }
 
-vector<pair<int, string>> getBestMoves(string boardStr, bool isWhite, int depth) {
+
+vector<pair<int, string>> getBestMoves(string boardStr, bool isWhite, int depth, int numThreads) {
     Board board;
     board.loadFromString(boardStr);
     auto moves = generateLegalMoves(board, isWhite);
 
-    int bestScore = numeric_limits<int>::min();
-    string bestMove;
-    PriorityQueue<pair<int,string>> pq;
-    for (auto& mv : moves) {
-        string tmp = boardStr;
-        // simulate only, don’t mutate the real board
-        int res = validateMove(mv, tmp, isWhite,true);
-        if (res < 41) continue;
+    PriorityQueue<pair<int, string>> pq;
 
-        Board sim;
-        sim.loadFromString(tmp);
-        int score = minimax(sim, depth - 1, false, isWhite);
+    if (numThreads > 1 && moves.size() > 1) {
+        ThreadPool pool(numThreads);
+        std::vector<std::future<void>> results;
 
-        if (score > bestScore) {
-            bestScore = score;
+        for (const auto& mv : moves) {
+            results.emplace_back(
+                pool.enqueue([&pq, boardStr, isWhite, depth, mv] {
+                    string tmp = boardStr;
+                    int res = validateMove(mv, tmp, isWhite, true);
+                    if (res >= 41) {
+                        Board sim;
+                        sim.loadFromString(tmp);
+                        int score = minimax(sim, depth - 1, false, isWhite);
+                        pq.push({score, mv});
+                    }
+                })
+            );
         }
-        pq.push({score,mv});
-    }
-    // now pop up to 5 into a vector:
-    vector<pair<int,string>> top5;
-    for (int i = 0; i < 5 && !pq.empty(); ++i) {
-        top5.push_back(pq.top());
-        pq.pop();
-    }
-    return top5;
-}
 
+        for (auto&& result : results) {
+            result.get(); // Wait for all tasks to complete
+        }
+    } else { // Single-threaded execution
+        for (const auto& mv : moves) {
+            string tmp = boardStr;
+            int res = validateMove(mv, tmp, isWhite, true);
+            if (res >= 41) {
+                Board sim;
+                sim.loadFromString(tmp);
+                int score = minimax(sim, depth - 1, false, isWhite);
+                pq.push({score, mv});
+            }
+        }
+    }
+
+    return pq.to_vector();
+}

@@ -4,7 +4,7 @@
 #include "minimax.h"
 #include <iostream>
 
-int validateMove(const string& move, string& board, bool turn, bool isSimulating = false) {
+int validateMove(const string& move, string& board, bool turn, bool isSimulating) {
     int srcRow = move[0] - 'a';
     int srcCol = move[1] - '1';
     int destRow = move[2] - 'a';
@@ -74,19 +74,14 @@ int validateMove(const string& move, string& board, bool turn, bool isSimulating
 }
 
 std::ostream& operator<<(std::ostream& os, const std::vector<std::pair<int,std::string>>& v) {
-    for (auto& [sc, mv] : v)
-        os << mv << " ("<< sc <<")\n";
+    for (const auto& [sc, mv] : v)
+        os << mv << " (" << sc << ")\n";
     return os;
 }
-void run(string& board, bool& isWhite) {
-    auto top5 = getBestMoves(board, isWhite, 3);
 
-    vector<pair<int,string>> top3;
-    for (int i = 0; i < 3 && i < (int)top5.size(); ++i)
-        top3.push_back(top5[i]);
+// Updated run function
+void run(string& board, bool& isWhite, int depth, int numThreads) {
+    auto topMoves = getBestMoves(board, isWhite, depth, numThreads);
 
-    cout << "\nTop 3 Suggestions:\n" << top3 << endl;
+    cout << "\nTop " << topMoves.size() << " Suggestions:\n" << topMoves << endl;
 }
-
-
-
